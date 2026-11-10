@@ -1,452 +1,384 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Calculateur d'Allure de Course à Pied</title>
-  <style>
-    /* Thèmes Clairs */
-    :root[data-theme="light-blue"] {
-      --bg-color: #f1f5f9;
-      --card-bg: #ffffff;
-      --accent: #0284c7;
-      --accent-hover: #0369a1;
-      --text-main: #0f172a;
-      --text-muted: #64748b;
-      --border: #e2e8f0;
-      --chip-bg: #f8fafc;
-      --result-bg: #f0f9ff;
-    }
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+        <title>Calculateur d'Allure de Course à Pied</title>
+        <style>
+            :root {
+                --bg-color: #f1f5f9;
+                --card-bg: #ffffff;
+                --accent: #0284c7;
+                --accent-hover: #0369a1;
+                --text-main: #0f172a;
+                --text-muted: #64748b;
+                --border: #e2e8f0;
+                --chip-bg: #f8fafc;
+                --result-bg: #f0f9ff;
+            }
 
-    :root[data-theme="light-mint"] {
-      --bg-color: #f0fdf4;
-      --card-bg: #ffffff;
-      --accent: #059669;
-      --accent-hover: #047857;
-      --text-main: #064e3b;
-      --text-muted: #475569;
-      --border: #dcfce7;
-      --chip-bg: #f6fbf7;
-      --result-bg: #ecfdf5;
-    }
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+                font-family:
+                    system-ui,
+                    -apple-system,
+                    BlinkMacSystemFont,
+                    "Segoe UI",
+                    Roboto,
+                    sans-serif;
+            }
 
-    :root[data-theme="light-orange"] {
-      --bg-color: #fff7ed;
-      --card-bg: #ffffff;
-      --accent: #ea580c;
-      --accent-hover: #c2410c;
-      --text-main: #431407;
-      --text-muted: #78350f;
-      --border: #ffedd5;
-      --chip-bg: #fffbf7;
-      --result-bg: #fff7ed;
-    }
+            html,
+            body {
+                height: 100%;
+                overflow: hidden; /* Empêche le scroll global sur mobile */
+            }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    }
+            body {
+                background-color: var(--bg-color);
+                color: var(--text-main);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding: 0.75rem;
+                transition:
+                    background-color 0.25s,
+                    color 0.25s;
+            }
 
-    html, body {
-      height: 100%;
-      overflow: hidden; /* Empêche le scroll global sur mobile */
-    }
+            .container {
+                background-color: var(--card-bg);
+                border-radius: 1rem;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+                width: 100%;
+                max-width: 440px;
+                padding: 1.25rem 1rem;
+                border: 1px solid var(--border);
+                transition:
+                    background-color 0.25s,
+                    border-color 0.25s;
+                /* Réhausse légèrement le bloc principal */
+                margin-bottom: 2rem;
+            }
 
-    body {
-      background-color: var(--bg-color);
-      color: var(--text-main);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 0.75rem;
-      transition: background-color 0.25s, color 0.25s;
-    }
+            .header {
+                margin-bottom: 0.75rem;
+            }
 
-    .container {
-      background-color: var(--card-bg);
-      border-radius: 1rem;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
-      width: 100%;
-      max-width: 440px;
-      padding: 1.25rem 1rem;
-      border: 1px solid var(--border);
-      transition: background-color 0.25s, border-color 0.25s;
-      /* Réhausse légèrement le bloc principal */
-      margin-bottom: 2rem; 
-    }
+            h1 {
+                font-size: 1.15rem;
+                font-weight: 700;
+                color: var(--text-main);
+            }
 
-    /* En-tête avec sélecteur de thème */
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 0.75rem;
-    }
+            .tabs {
+                display: flex;
+                gap: 0.35rem;
+                background-color: var(--bg-color);
+                padding: 0.2rem;
+                border-radius: 0.5rem;
+                margin-bottom: 0.85rem;
+            }
 
-    h1 {
-      font-size: 1.15rem;
-      font-weight: 700;
-      color: var(--text-main);
-    }
+            .tab-btn {
+                flex: 1;
+                padding: 0.45rem 0.2rem;
+                border: none;
+                background: transparent;
+                color: var(--text-muted);
+                font-weight: 600;
+                border-radius: 0.375rem;
+                cursor: pointer;
+                transition: all 0.2s;
+                font-size: 0.75rem;
+            }
 
-    .theme-selector {
-      display: flex;
-      gap: 0.25rem;
-      background: var(--bg-color);
-      padding: 0.2rem;
-      border-radius: 0.5rem;
-      border: 1px solid var(--border);
-    }
+            .tab-btn.active {
+                background-color: var(--card-bg);
+                color: var(--accent);
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            }
 
-    .theme-dot {
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      border: 2px solid transparent;
-      cursor: pointer;
-      transition: transform 0.15s, border-color 0.15s;
-    }
+            .preset-btns {
+                display: flex;
+                gap: 0.35rem;
+                margin-bottom: 0.85rem;
+                justify-content: space-between;
+            }
 
-    .theme-dot:hover {
-      transform: scale(1.15);
-    }
+            .chip {
+                flex: 1;
+                text-align: center;
+                background: var(--chip-bg);
+                border: 1px solid var(--border);
+                color: var(--text-muted);
+                padding: 0.3rem 0.2rem;
+                border-radius: 0.4rem;
+                font-size: 0.7rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.2s;
+            }
 
-    .theme-dot.active {
-      border-color: var(--text-main);
-    }
+            .chip:hover {
+                border-color: var(--accent);
+                color: var(--accent);
+            }
 
-    .theme-dot.blue { background-color: #0284c7; }
-    .theme-dot.mint { background-color: #059669; }
-    .theme-dot.orange { background-color: #ea580c; }
+            .form-group {
+                margin-bottom: 0.75rem;
+            }
 
-    .tabs {
-      display: flex;
-      gap: 0.35rem;
-      background-color: var(--bg-color);
-      padding: 0.2rem;
-      border-radius: 0.5rem;
-      margin-bottom: 0.85rem;
-    }
+            label {
+                display: block;
+                font-size: 0.75rem;
+                font-weight: 600;
+                margin-bottom: 0.3rem;
+                color: var(--text-muted);
+            }
 
-    .tab-btn {
-      flex: 1;
-      padding: 0.45rem 0.2rem;
-      border: none;
-      background: transparent;
-      color: var(--text-muted);
-      font-weight: 600;
-      border-radius: 0.375rem;
-      cursor: pointer;
-      transition: all 0.2s;
-      font-size: 0.75rem;
-    }
+            .input-row {
+                display: flex;
+                gap: 0.35rem;
+                align-items: center;
+            }
 
-    .tab-btn.active {
-      background-color: var(--card-bg);
-      color: var(--accent);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
+            input {
+                width: 100%;
+                background: var(--bg-color);
+                border: 1px solid var(--border);
+                color: var(--text-main);
+                padding: 0.45rem 0.6rem;
+                border-radius: 0.4rem;
+                font-size: 0.9rem;
+                font-weight: 500;
+                outline: none;
+                transition: border-color 0.2s;
+                text-align: center;
+            }
 
-    .preset-btns {
-      display: flex;
-      gap: 0.35rem;
-      margin-bottom: 0.85rem;
-      justify-content: space-between;
-    }
+            input:focus {
+                border-color: var(--accent);
+            }
 
-    .chip {
-      flex: 1;
-      text-align: center;
-      background: var(--chip-bg);
-      border: 1px solid var(--border);
-      color: var(--text-muted);
-      padding: 0.3rem 0.2rem;
-      border-radius: 0.4rem;
-      font-size: 0.7rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
+            .unit {
+                color: var(--text-muted);
+                font-size: 0.75rem;
+                font-weight: 600;
+                white-space: nowrap;
+                min-width: 40px;
+            }
 
-    .chip:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
+            .tab-content {
+                display: none;
+            }
 
-    .form-group {
-      margin-bottom: 0.75rem;
-    }
+            .tab-content.active {
+                display: block;
+            }
 
-    label {
-      display: block;
-      font-size: 0.75rem;
-      font-weight: 600;
-      margin-bottom: 0.3rem;
-      color: var(--text-muted);
-    }
+            .result-box {
+                margin-top: 1rem;
+                padding: 0.75rem;
+                background-color: var(--result-bg);
+                border-radius: 0.5rem;
+                border-left: 3px solid var(--accent);
+                text-align: center;
+                transition:
+                    background-color 0.25s,
+                    border-color 0.25s;
+            }
 
-    .input-row {
-      display: flex;
-      gap: 0.35rem;
-      align-items: center;
-    }
+            .result-title {
+                font-size: 0.65rem;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                color: var(--text-muted);
+                margin-bottom: 0.15rem;
+                font-weight: 600;
+            }
 
-    input {
-      width: 100%;
-      background: var(--bg-color);
-      border: 1px solid var(--border);
-      color: var(--text-main);
-      padding: 0.45rem 0.6rem;
-      border-radius: 0.4rem;
-      font-size: 0.9rem;
-      font-weight: 500;
-      outline: none;
-      transition: border-color 0.2s;
-      text-align: center;
-    }
+            .result-value {
+                font-size: 1.4rem;
+                font-weight: 800;
+                color: var(--accent);
+                line-height: 1.2;
+            }
 
-    input:focus {
-      border-color: var(--accent);
-    }
+            .result-subtext {
+                font-size: 0.75rem;
+                color: var(--text-muted);
+                margin-top: 0.15rem;
+                font-weight: 500;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>Allure Running</h1>
+            </div>
 
-    .unit {
-      color: var(--text-muted);
-      font-size: 0.75rem;
-      font-weight: 600;
-      white-space: nowrap;
-      min-width: 40px;
-    }
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('pace')">Allure & Vitesse</button>
+                <button class="tab-btn" onclick="switchTab('time')">Temps Estimé</button>
+            </div>
 
-    .tab-content {
-      display: none;
-    }
+            <!-- Mode 1: Calculer Allure/Vitesse -->
+            <div id="tab-pace" class="tab-content active">
+                <div class="preset-btns">
+                    <button class="chip" onclick="setPresetDistance('pace', 5)">5 km</button>
+                    <button class="chip" onclick="setPresetDistance('pace', 10)">10 km</button>
+                    <button class="chip" onclick="setPresetDistance('pace', 21.0975)">Semi</button>
+                    <button class="chip" onclick="setPresetDistance('pace', 42.195)">Marathon</button>
+                </div>
 
-    .tab-content.active {
-      display: block;
-    }
+                <div class="form-group">
+                    <label>Distance</label>
+                    <div class="input-row">
+                        <input type="number" id="pace-dist" step="0.01" placeholder="ex: 10" oninput="calculatePace()" />
+                        <span class="unit">km</span>
+                    </div>
+                </div>
 
-    .result-box {
-      margin-top: 1rem;
-      padding: 0.75rem;
-      background-color: var(--result-bg);
-      border-radius: 0.5rem;
-      border-left: 3px solid var(--accent);
-      text-align: center;
-      transition: background-color 0.25s, border-color 0.25s;
-    }
+                <div class="form-group">
+                    <label>Temps chrono (hh : mm : ss)</label>
+                    <div class="input-row">
+                        <input type="number" id="pace-h" placeholder="hh" min="0" oninput="calculatePace()" />
+                        <span>:</span>
+                        <input type="number" id="pace-m" placeholder="mm" min="0" max="59" oninput="calculatePace()" />
+                        <span>:</span>
+                        <input type="number" id="pace-s" placeholder="ss" min="0" max="59" oninput="calculatePace()" />
+                    </div>
+                </div>
 
-    .result-title {
-      font-size: 0.65rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--text-muted);
-      margin-bottom: 0.15rem;
-      font-weight: 600;
-    }
+                <div class="result-box">
+                    <div class="result-title">Allure requise</div>
+                    <div class="result-value" id="pace-res-pace">--:-- min/km</div>
+                    <div class="result-subtext" id="pace-res-speed">-- km/h</div>
+                </div>
+            </div>
 
-    .result-value {
-      font-size: 1.4rem;
-      font-weight: 800;
-      color: var(--accent);
-      line-height: 1.2;
-    }
+            <!-- Mode 2: Calculer Temps -->
+            <div id="tab-time" class="tab-content">
+                <div class="preset-btns">
+                    <button class="chip" onclick="setPresetDistance('time', 5)">5 km</button>
+                    <button class="chip" onclick="setPresetDistance('time', 10)">10 km</button>
+                    <button class="chip" onclick="setPresetDistance('time', 21.0975)">Semi</button>
+                    <button class="chip" onclick="setPresetDistance('time', 42.195)">Marathon</button>
+                </div>
 
-    .result-subtext {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      margin-top: 0.15rem;
-      font-weight: 500;
-    }
-  </style>
-</head>
-<body>
+                <div class="form-group">
+                    <label>Distance</label>
+                    <div class="input-row">
+                        <input type="number" id="time-dist" step="0.01" placeholder="ex: 10" oninput="calculateTime()" />
+                        <span class="unit">km</span>
+                    </div>
+                </div>
 
-  <div class="container">
-    <div class="header">
-      <h1>Allure Running</h1>
-      <div class="theme-selector" title="Changer de thème">
-        <div class="theme-dot blue active" onclick="setTheme('light-blue')" title="Bleu Épuré"></div>
-        <div class="theme-dot mint" onclick="setTheme('light-mint')" title="Sauge & Menthe"></div>
-        <div class="theme-dot orange" onclick="setTheme('light-orange')" title="Orange Sunset"></div>
-      </div>
-    </div>
+                <div class="form-group">
+                    <label>Allure cible (mm : ss)</label>
+                    <div class="input-row">
+                        <input type="number" id="time-pace-m" placeholder="mm" min="0" oninput="calculateTime()" />
+                        <span>:</span>
+                        <input type="number" id="time-pace-s" placeholder="ss" min="0" max="59" oninput="calculateTime()" />
+                        <span class="unit">min/km</span>
+                    </div>
+                </div>
 
-    <div class="tabs">
-      <button class="tab-btn active" onclick="switchTab('pace')">Allure & Vitesse</button>
-      <button class="tab-btn" onclick="switchTab('time')">Temps Estimé</button>
-    </div>
-
-    <!-- Mode 1: Calculer Allure/Vitesse -->
-    <div id="tab-pace" class="tab-content active">
-      <div class="preset-btns">
-        <button class="chip" onclick="setPresetDistance('pace', 5)">5 km</button>
-        <button class="chip" onclick="setPresetDistance('pace', 10)">10 km</button>
-        <button class="chip" onclick="setPresetDistance('pace', 21.0975)">Semi</button>
-        <button class="chip" onclick="setPresetDistance('pace', 42.195)">Marathon</button>
-      </div>
-
-      <div class="form-group">
-        <label>Distance</label>
-        <div class="input-row">
-          <input type="number" id="pace-dist" step="0.01" placeholder="ex: 10" oninput="calculatePace()">
-          <span class="unit">km</span>
+                <div class="result-box">
+                    <div class="result-title">Temps total estimé</div>
+                    <div class="result-value" id="time-res-time">--:--:--</div>
+                    <div class="result-subtext" id="time-res-speed">-- km/h</div>
+                </div>
+            </div>
         </div>
-      </div>
 
-      <div class="form-group">
-        <label>Temps chrono (hh : mm : ss)</label>
-        <div class="input-row">
-          <input type="number" id="pace-h" placeholder="hh" min="0" oninput="calculatePace()">
-          <span>:</span>
-          <input type="number" id="pace-m" placeholder="mm" min="0" max="59" oninput="calculatePace()">
-          <span>:</span>
-          <input type="number" id="pace-s" placeholder="ss" min="0" max="59" oninput="calculatePace()">
-        </div>
-      </div>
+        <script>
+            function switchTab(tabName) {
+                document.querySelectorAll(".tab-btn").forEach((btn) => btn.classList.remove("active"));
+                document.querySelectorAll(".tab-content").forEach((content) => content.classList.remove("active"));
 
-      <div class="result-box">
-        <div class="result-title">Allure requise</div>
-        <div class="result-value" id="pace-res-pace">--:-- min/km</div>
-        <div class="result-subtext" id="pace-res-speed">-- km/h</div>
-      </div>
-    </div>
+                if (tabName === "pace") {
+                    document.querySelectorAll(".tab-btn")[0].classList.add("active");
+                    document.getElementById("tab-pace").classList.add("active");
+                } else {
+                    document.querySelectorAll(".tab-btn")[1].classList.add("active");
+                    document.getElementById("tab-time").classList.add("active");
+                }
+            }
 
-    <!-- Mode 2: Calculer Temps -->
-    <div id="tab-time" class="tab-content">
-      <div class="preset-btns">
-        <button class="chip" onclick="setPresetDistance('time', 5)">5 km</button>
-        <button class="chip" onclick="setPresetDistance('time', 10)">10 km</button>
-        <button class="chip" onclick="setPresetDistance('time', 21.0975)">Semi</button>
-        <button class="chip" onclick="setPresetDistance('time', 42.195)">Marathon</button>
-      </div>
+            function setPresetDistance(tab, dist) {
+                if (tab === "pace") {
+                    document.getElementById("pace-dist").value = dist;
+                    calculatePace();
+                } else {
+                    document.getElementById("time-dist").value = dist;
+                    calculateTime();
+                }
+            }
 
-      <div class="form-group">
-        <label>Distance</label>
-        <div class="input-row">
-          <input type="number" id="time-dist" step="0.01" placeholder="ex: 10" oninput="calculateTime()">
-          <span class="unit">km</span>
-        </div>
-      </div>
+            function formatTwoDigits(num) {
+                return String(num).padStart(2, "0");
+            }
 
-      <div class="form-group">
-        <label>Allure cible (mm : ss)</label>
-        <div class="input-row">
-          <input type="number" id="time-pace-m" placeholder="mm" min="0" oninput="calculateTime()">
-          <span>:</span>
-          <input type="number" id="time-pace-s" placeholder="ss" min="0" max="59" oninput="calculateTime()">
-          <span class="unit">min/km</span>
-        </div>
-      </div>
+            function calculatePace() {
+                const dist = parseFloat(document.getElementById("pace-dist").value);
+                const h = parseInt(document.getElementById("pace-h").value) || 0;
+                const m = parseInt(document.getElementById("pace-m").value) || 0;
+                const s = parseInt(document.getElementById("pace-s").value) || 0;
 
-      <div class="result-box">
-        <div class="result-title">Temps total estimé</div>
-        <div class="result-value" id="time-res-time">--:--:--</div>
-        <div class="result-subtext" id="time-res-speed">-- km/h</div>
-      </div>
-    </div>
+                const totalSeconds = h * 3600 + m * 60 + s;
 
-  </div>
+                if (!dist || dist <= 0 || totalSeconds <= 0) {
+                    document.getElementById("pace-res-pace").innerText = "--:-- min/km";
+                    document.getElementById("pace-res-speed").innerText = "-- km/h";
+                    return;
+                }
 
-  <script>
-    // Gestion du Thème
-    function setTheme(themeName) {
-      document.documentElement.setAttribute('data-theme', themeName);
-      localStorage.setItem('running_app_theme', themeName);
-      
-      document.querySelectorAll('.theme-dot').forEach(dot => dot.classList.remove('active'));
-      if (themeName === 'light-blue') document.querySelectorAll('.theme-dot')[0].classList.add('active');
-      if (themeName === 'light-mint') document.querySelectorAll('.theme-dot')[1].classList.add('active');
-      if (themeName === 'light-orange') document.querySelectorAll('.theme-dot')[2].classList.add('active');
-    }
+                const secPerKm = totalSeconds / dist;
+                const paceMin = Math.floor(secPerKm / 60);
+                const paceSec = Math.round(secPerKm % 60);
 
-    // Chargement du thème sauvegardé ou par défaut
-    const savedTheme = localStorage.getItem('running_app_theme') || 'light-blue';
-    setTheme(savedTheme);
+                const finalPaceMin = paceSec === 60 ? paceMin + 1 : paceMin;
+                const finalPaceSec = paceSec === 60 ? 0 : paceSec;
 
-    function switchTab(tabName) {
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-      
-      if (tabName === 'pace') {
-        document.querySelectorAll('.tab-btn')[0].classList.add('active');
-        document.getElementById('tab-pace').classList.add('active');
-      } else {
-        document.querySelectorAll('.tab-btn')[1].classList.add('active');
-        document.getElementById('tab-time').classList.add('active');
-      }
-    }
+                const speedKmH = (dist / (totalSeconds / 3600)).toFixed(2);
 
-    function setPresetDistance(tab, dist) {
-      if (tab === 'pace') {
-        document.getElementById('pace-dist').value = dist;
-        calculatePace();
-      } else {
-        document.getElementById('time-dist').value = dist;
-        calculateTime();
-      }
-    }
+                document.getElementById("pace-res-pace").innerText = `${finalPaceMin}'${formatTwoDigits(finalPaceSec)}" /km`;
+                document.getElementById("pace-res-speed").innerText = `${speedKmH} km/h`;
+            }
 
-    function formatTwoDigits(num) {
-      return String(num).padStart(2, '0');
-    }
+            function calculateTime() {
+                const dist = parseFloat(document.getElementById("time-dist").value);
+                const paceM = parseInt(document.getElementById("time-pace-m").value) || 0;
+                const paceS = parseInt(document.getElementById("time-pace-s").value) || 0;
 
-    function calculatePace() {
-      const dist = parseFloat(document.getElementById('pace-dist').value);
-      const h = parseInt(document.getElementById('pace-h').value) || 0;
-      const m = parseInt(document.getElementById('pace-m').value) || 0;
-      const s = parseInt(document.getElementById('pace-s').value) || 0;
+                const secPerKm = paceM * 60 + paceS;
 
-      const totalSeconds = (h * 3600) + (m * 60) + s;
+                if (!dist || dist <= 0 || secPerKm <= 0) {
+                    document.getElementById("time-res-time").innerText = "--:--:--";
+                    document.getElementById("time-res-speed").innerText = "-- km/h";
+                    return;
+                }
 
-      if (!dist || dist <= 0 || totalSeconds <= 0) {
-        document.getElementById('pace-res-pace').innerText = '--:-- min/km';
-        document.getElementById('pace-res-speed').innerText = '-- km/h';
-        return;
-      }
+                const totalSeconds = Math.round(dist * secPerKm);
+                const h = Math.floor(totalSeconds / 3600);
+                const m = Math.floor((totalSeconds % 3600) / 60);
+                const s = totalSeconds % 60;
 
-      const secPerKm = totalSeconds / dist;
-      const paceMin = Math.floor(secPerKm / 60);
-      const paceSec = Math.round(secPerKm % 60);
+                const speedKmH = (3600 / secPerKm).toFixed(2);
 
-      const finalPaceMin = paceSec === 60 ? paceMin + 1 : paceMin;
-      const finalPaceSec = paceSec === 60 ? 0 : paceSec;
+                const formattedTime =
+                    h > 0
+                        ? `${h}h ${formatTwoDigits(m)}m ${formatTwoDigits(s)}s`
+                        : `${formatTwoDigits(m)}m ${formatTwoDigits(s)}s`;
 
-      const speedKmH = (dist / (totalSeconds / 3600)).toFixed(2);
-
-      document.getElementById('pace-res-pace').innerText = `${finalPaceMin}'${formatTwoDigits(finalPaceSec)}" /km`;
-      document.getElementById('pace-res-speed').innerText = `${speedKmH} km/h`;
-    }
-
-    function calculateTime() {
-      const dist = parseFloat(document.getElementById('time-dist').value);
-      const paceM = parseInt(document.getElementById('time-pace-m').value) || 0;
-      const paceS = parseInt(document.getElementById('time-pace-s').value) || 0;
-
-      const secPerKm = (paceM * 60) + paceS;
-
-      if (!dist || dist <= 0 || secPerKm <= 0) {
-        document.getElementById('time-res-time').innerText = '--:--:--';
-        document.getElementById('time-res-speed').innerText = '-- km/h';
-        return;
-      }
-
-      const totalSeconds = Math.round(dist * secPerKm);
-      const h = Math.floor(totalSeconds / 3600);
-      const m = Math.floor((totalSeconds % 3600) / 60);
-      const s = totalSeconds % 60;
-
-      const speedKmH = (3600 / secPerKm).toFixed(2);
-
-      const formattedTime = h > 0 
-        ? `${h}h ${formatTwoDigits(m)}m ${formatTwoDigits(s)}s` 
-        : `${formatTwoDigits(m)}m ${formatTwoDigits(s)}s`;
-
-      document.getElementById('time-res-time').innerText = formattedTime;
-      document.getElementById('time-res-speed').innerText = `${speedKmH} km/h`;
-    }
-  </script>
-
-</body>
+                document.getElementById("time-res-time").innerText = formattedTime;
+                document.getElementById("time-res-speed").innerText = `${speedKmH} km/h`;
+            }
+        </script>
+    </body>
 </html>
